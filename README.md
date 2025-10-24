@@ -6,7 +6,7 @@ endpoint: http://loki-gateway.test.svc.cluster.local:80/loki/api/v1/push
 # replace the namespace where loki is deploying apart from that everything need to be same
 ```
 
-## values-prometheus.yaml
+## values-prometheus.yaml file
 ```
 storageClassName: gp2    # specify your storage class
 accessModes: ["ReadWriteOnce"]
@@ -26,3 +26,83 @@ X-Scope-OrgID: tenant1   # Replace with your tenant ID/name
 Example:
 <img width="1511" height="199" alt="image" src="https://github.com/user-attachments/assets/fd17aabc-c4da-4996-af42-4943a806f287" />
 
+
+## values-loki.yaml file
+
+```
+  # Storage configuration
+  storage:
+    type: s3
+    bucketNames:
+      chunks: gpu-loki-chunks
+      ruler: gpu-loki-ruler          # Change to your S3 bucket names
+      admin: gpu-loki-admin
+    s3:
+      region: us-west-2           # Change to your region
+      s3ForcePathStyle: false
+      insecure: false
+```
+
+```
+# Write component configuration (for SimpleScalable mode)
+write:
+  replicas: 1
+  extraEnv:
+    - name: AWS_REGION    
+      value: us-west-2   # Change to your region
+    - name: AWS_WEB_IDENTITY_TOKEN_FILE
+      value: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
+    - name: AWS_ROLE_ARN
+      value: arn:aws:iam::account_num:role/loki-irsa-role    # Change to your IAM role ARN
+  
+  # Persistence for write pods
+  persistence:
+    enabled: true
+    size: 3Gi    # Choose your storage size
+    storageClass: "gp2"  # Leave empty for default, or specify your storage class
+```
+
+```
+read:
+  replicas: 1
+  extraEnv:
+    - name: AWS_REGION
+      value: us-west-2
+    - name: AWS_WEB_IDENTITY_TOKEN_FILE
+      value: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
+    - name: AWS_ROLE_ARN
+      value: arn:aws:iam::account_num:role/loki-irsa-role
+  
+  # Persistence for read pods
+  persistence:
+    enabled: true
+    size: 3Gi
+    storageClass: "gp2"
+```
+
+```
+backend:
+  replicas: 1
+  extraEnv:
+    - name: AWS_REGION
+      value: us-west-2
+    - name: AWS_WEB_IDENTITY_TOKEN_FILE
+      value: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
+    - name: AWS_ROLE_ARN
+      value: arn:aws:iam::account_num:role/loki-irsa-role
+  
+  # Persistence for backend pods
+  persistence:
+    enabled: true
+    size: 3Gi
+    storageClass: "gp2"
+```
+
+```
+# Service Account
+serviceAccount:
+  create: false
+  name: loki-irsa-sa    # Specify your existing ServiceAccount name
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::account_num:role/loki-irsa-role
+```

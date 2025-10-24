@@ -210,3 +210,32 @@ compactor:
 minio:     # must be false because we are using s3
   enabled: false
 ```
+
+# values-grafan.yaml file
+
+```
+adminUser: admin      #replace grafana dashboard secrets
+adminPassword: admin
+```
+
+```
+persistence:
+  enabled: true          #choose storage and size
+  size: 8Gi
+  storageClassName: gp2
+```
+
+```
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-kube-prometheus-prometheus.test.svc.cluster.local:9090           # change the test with your namespace 
+        access: proxy
+        isDefault: true
+      - name: Loki
+        type: loki
+        url: http://loki.monitoring.svc.cluster.local:3100         #replace the monitoring with your namespace
+        access: proxy

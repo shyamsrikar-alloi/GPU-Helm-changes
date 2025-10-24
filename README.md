@@ -89,7 +89,7 @@ backend:
     - name: AWS_WEB_IDENTITY_TOKEN_FILE
       value: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
     - name: AWS_ROLE_ARN
-      value: arn:aws:iam::account_num:role/loki-irsa-role
+      value: arn:aws:iam::account_num:role/loki-irsa-role   # replace account id
   
   # Persistence for backend pods
   persistence:
@@ -166,11 +166,47 @@ mimir:
 ```
 alertmanager:
   replicas: 1
-  persistentVolume:
+  persistentVolume:   #choose size and storage class
     enabled: true
     size: 1Gi
     storageClass: gp2
     accessModes:
       - ReadWriteOnce
 ```
+```
+ingester:
+  replicas: 2    #minimum 2 required for processing
+  persistentVolume:
+    enabled: true
+    size: 4Gi   #choose the size
+    storageClass: gp2
+    accessModes:
+      - ReadWriteOnce
+```
+
+```
+store_gateway:
+  replicas: 1
+  persistentVolume:
+    enabled: true
+    size: 4Gi   # choose size and class
+    storageClass: gp2
+    accessModes:
+      - ReadWriteOnce
+```
+
+```
+compactor:
+  replicas: 1
+  persistentVolume:
+    enabled: true
+    size: 4Gi  # choose storage and size
+    storageClass: gp2
+    accessModes:
+      - ReadWriteOnce
+```
+
+```
+minio:     # must be false because we are using s3
+  enabled: false
 ```

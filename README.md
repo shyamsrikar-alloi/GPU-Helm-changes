@@ -1,3 +1,8 @@
+# Note:
+- Adjust replica counts as needed
+- replace storage class and size accordingly
+
+
 # Values needs to be change in the values file
 
 ## values-otel.yaml file
@@ -174,6 +179,14 @@ alertmanager:
       - ReadWriteOnce
 ```
 ```
+distributor:
+  replicas: 1
+  extraArgs:
+    -distributor.ingestion-rate-limit: "200000"    # Adjust as needed 
+    -distributor.ingestion-burst-size: "400000"    # Adjust as needed do not reduce less than this.
+```
+
+```
 ingester:
   replicas: 2    #minimum 2 required for processing
   persistentVolume:
@@ -211,7 +224,7 @@ minio:     # must be false because we are using s3
   enabled: false
 ```
 
-# values-grafan.yaml file
+# values-grafana.yaml file
 
 ```
 adminUser: admin      #replace grafana dashboard secrets

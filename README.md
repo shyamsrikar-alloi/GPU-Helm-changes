@@ -130,7 +130,7 @@ mimir:
       storage:
         backend: s3
         s3:
-          bucket_name: gpu-mimir
+          bucket_name: gpu-mimir   #replace bucket name and region
           endpoint: s3.us-west-2.amazonaws.com
           region: us-west-2
           insecure: false

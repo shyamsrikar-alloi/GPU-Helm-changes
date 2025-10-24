@@ -106,3 +106,71 @@ serviceAccount:
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::account_num:role/loki-irsa-role
 ```
+
+
+## values-mimir.yaml
+
+```
+# Namespace where Mimir will be deployed
+namespace: test   # Change to your desired namespace
+```
+
+```
+# ServiceAccount + IRSA configuration
+serviceAccount:
+  create: false                 # Use existing service account
+  name: mimir-irsa-sa
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::aws_account_number:role/mimir-irsa-role
+
+# Core Mimir configuration (YAML inside ConfigMap)
+mimir:
+  structuredConfig:
+    common:
+      storage:
+        backend: s3
+        s3:
+          bucket_name: gpu-mimir
+          endpoint: s3.us-west-2.amazonaws.com
+          region: us-west-2
+          insecure: false
+```
+#### in the below modify bucket name and region
+```
+    # TSDB block storage configuration
+    blocks_storage:
+      backend: s3
+      bucket_store:
+        sync_dir: /data/tsdb-sync
+      s3:
+        bucket_name: gpu-mimir
+        region: us-west-2
+
+    # Ruler configuration (stores rule files in S3)
+    ruler_storage:
+      backend: s3
+      storage_prefix: rules
+      s3:
+        bucket_name: gpu-mimir
+        region: us-west-2
+
+    # Alertmanager configuration (stores silences, alerts)
+    alertmanager_storage:
+      backend: s3
+      storage_prefix: alertmanager
+      s3:
+        bucket_name: gpu-mimir
+        region: us-west-2
+```
+
+```
+alertmanager:
+  replicas: 1
+  persistentVolume:
+    enabled: true
+    size: 1Gi
+    storageClass: gp2
+    accessModes:
+      - ReadWriteOnce
+```
+```

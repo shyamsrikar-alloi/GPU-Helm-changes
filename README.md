@@ -250,5 +250,5 @@ datasources:
         isDefault: true
       - name: Loki
         type: loki
-        url: http://loki-gateway.monitoring.svc.cluster.local:3100         #replace the monitoring with your namespace
+        url: http://loki-gateway.monitoring.svc.cluster.local:80         #replace the monitoring with your namespace
         access: proxy

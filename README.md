@@ -1,7 +1,7 @@
 # Note:
 - Adjust replica counts as needed
 - replace storage class and size accordingly
-
+- This doucument refers to create the buckets and service accounts for AWS
 
 # Values needs to be change in the values file
 
